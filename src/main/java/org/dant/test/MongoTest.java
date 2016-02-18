@@ -15,8 +15,9 @@ public class MongoTest {
 			
          // Now connect to your databases
          MongoDatabase db = mongoClient.getDatabase("neverlost");
-         db.getCollection("users").insertOne(new Document("username","milan").append("password", "milan"));
+         db.getCollection("users").insertOne(new Document("email","shamil@mail.com").append("username","shamil").append("password", "shamil"));
 			
+         mongoClient.close();
       }catch(Exception e){
          System.err.println( e.getClass().getName() + ": " + e.getMessage() );
       }
