@@ -19,7 +19,7 @@ import com.mongodb.client.MongoDatabase;
 @Path("/authentication")
 public class AuthenticationEndpoint {
 
-    @GET
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public String authenticateUser(JsonConnectionBean connect) {
