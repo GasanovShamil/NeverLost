@@ -1,6 +1,7 @@
 package org.dant.test;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -19,22 +20,23 @@ import com.mongodb.client.MongoDatabase;
 @Path("/authentication")
 public class AuthenticationEndpoint {
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public String authenticateUser(JsonConnectionBean connect) {
+    @POST
+    @Produces(MediaType.TEXT_HTML)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String authenticateUser(@FormParam("email") String email, 
+            							@FormParam("password") String password) {
 
        
-            JsonSessionToken token=authenticate(connect.getEmail(), connect.getPassword());
+            JsonSessionToken token=authenticate(email, password);
 
             // Issue a token for the user
             // String token = issueToken(username);
-
             // Return the token on the response
             //return Response.ok(token).build();
             //return Response.status(Response.Status.UNAUTHORIZED).build();
             String res=(token==null)?"UNAUTHORIZED":""+token.getUsername()+" : "+token.getToken();
-            return res;
+            return "<html> " + "<title>" + "Test Jersey" + "</title>"
+                    + "<body><h1>" + res + "</h1></body>" + "</html> ";
             
     }
 
