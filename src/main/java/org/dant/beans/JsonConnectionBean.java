@@ -2,13 +2,18 @@ package org.dant.beans;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class JsonConnectionBean implements Serializable {
 
 	private static final long serialVersionUID = 798241628003365812L;
 
-	private String email;
-	private String password;
+	public String email;
+	public String password;
 
+	public JsonConnectionBean(){}
+	
 	public String getEmail() {
 		return email;
 	}
@@ -25,4 +30,7 @@ public class JsonConnectionBean implements Serializable {
 		this.password = password;
 	}
 
+	public String toString(){
+		return ""+email+" : "+password;
+	}
 }
