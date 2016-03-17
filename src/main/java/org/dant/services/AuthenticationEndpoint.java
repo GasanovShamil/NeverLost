@@ -21,28 +21,28 @@ import com.mongodb.client.MongoDatabase;
 @Path("/authentication")
 public class AuthenticationEndpoint {
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response authenticateUser(JsonConnectionBean connect) {
-
-       
-            JsonSessionToken token=authenticate(connect.getEmail(), connect.getPassword());
-
-            // Issue a token for the user
-            
-
-            // Return the token on the response
-            if(token!= null){
-            	return Response.ok(new Gson().toJson(token)).build();
-            }else{
-            	return Response.status(Response.Status.UNAUTHORIZED).build();
-            }
-            
-            
-           
-            
-    }
+//    @POST
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    public Response authenticateUser(JsonConnectionBean connect) {
+//
+//       
+//            JsonSessionToken token=authenticate(connect.getEmail(), connect.getPassword());
+//
+//            // Issue a token for the user
+//            
+//
+//            // Return the token on the response
+//            if(token!= null){
+//            	return Response.ok(new Gson().toJson(token)).build();
+//            }else{
+//            	return Response.status(Response.Status.UNAUTHORIZED).build();
+//            }
+//            
+//            
+//           
+//            
+//    }
 
     
 //    @POST
