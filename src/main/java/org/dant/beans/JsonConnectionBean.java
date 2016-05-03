@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
+
 public class JsonConnectionBean implements Serializable {
 
 	private static final long serialVersionUID = 798241628003365812L;
