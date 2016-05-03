@@ -24,6 +24,7 @@ public class AuthenticationEndpoint {
 	public Response authenticateUser(JsonConnectionBean bean) {
 		JsonSessionToken token = authenticate(bean);
 		if (token != null) {
+			System.out.println("login : "+bean.getEmail()+", password : "+bean.getPassword());
 			return Response.ok(token).build();
 		} else {
 			return Response.status(Response.Status.UNAUTHORIZED).build();
