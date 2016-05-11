@@ -13,9 +13,13 @@ public class PusherService {
 	final static String key = "5102cb4079a2a7367004";
 	final static String secret = "1a09ce5f0d01611a3344";
 	
-	private void envoieMessage(ArrayList<String> list,Pusher p,String message){
-		p.trigger(list, "my event", Collections.singletonMap("message", message));
-
+	// Cette méthode permet d'envoie un message groupé
+	private void envoieMessage(ArrayList<String> list,Pusher p,String message,String event){
+		p.trigger(list, event, Collections.singletonMap("message", message));
+	}
+	
+	private void mesCoordonnées(ArrayList<String> list, Pusher p,String event,int x,int y){
+		p.trigger(list, event, Collections.singletonMap("ma position", (x+" "+y)));
 	}
 			
 	public static void main(String[] args){
