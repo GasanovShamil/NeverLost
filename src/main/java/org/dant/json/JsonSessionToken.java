@@ -1,4 +1,4 @@
-package org.dant.beans;
+package org.dant.json;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -12,7 +12,7 @@ public class JsonSessionToken implements Serializable {
 	
 	public String email;
 	public String token;
-	
+	public String test;
 
 	public String getEmail() {
 		return email;
@@ -31,7 +31,15 @@ public class JsonSessionToken implements Serializable {
 		return token;
 	}
 
-	public void genererToken(){
+	public void generateToken(){
 		this.token = UUID.randomUUID().toString();
+	}
+	
+	public String getTest() {
+		return test;
+	}
+
+	public void setTest(String test) {
+		this.test=test;
 	}
 }

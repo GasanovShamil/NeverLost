@@ -1,4 +1,4 @@
-package org.dant.beans;
+package org.dant.json;
 
 import java.io.Serializable;
 
@@ -11,7 +11,8 @@ public class JsonConnectionBean implements Serializable {
 
 	public String email;
 	public String password;
-
+	public String username;
+	
 	public JsonConnectionBean(){}
 	
 	public String getEmail() {
@@ -30,7 +31,16 @@ public class JsonConnectionBean implements Serializable {
 		this.password = password;
 	}
 
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
 	public String toString(){
 		return ""+email+" : "+password;
 	}
+	
 }

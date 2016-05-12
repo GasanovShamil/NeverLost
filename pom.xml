@@ -24,14 +24,14 @@
 			<artifactId>mongo-java-driver</artifactId>
 			<version>3.2.1</version>
 		</dependency>
-		
+
 		<dependency>
-	<groupId>com.google.code.gson</groupId>
-	<artifactId>gson</artifactId>
-	<version>2.6.2</version>
-</dependency>
-		
-		
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.6.2</version>
+		</dependency>
+
+
 		<!-- JAX-RS -->
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
@@ -44,7 +44,7 @@
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet</artifactId>
 			<version>${jersey2.version}</version>
-			<scope>provided</scope> 
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
@@ -56,16 +56,22 @@
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-client</artifactId>
 			<version>${jersey2.version}</version>
-			<scope>provided</scope> 
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-json-jackson</artifactId>
 			<version>${jersey2.version}</version>
-			<scope>provided</scope> 
+			<scope>provided</scope>
 		</dependency>
-		
-		
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
+		</dependency>
+
+
 
 	</dependencies>
 	<build>
