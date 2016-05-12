@@ -19,7 +19,7 @@ public class AuthFilter implements ContainerRequestFilter {
 	public void filter(ContainerRequestContext context) throws IOException {
 		String url = context.getUriInfo().getPath();
 
-		if (!url.contains("login") && !url.contains("checkout")) {
+		if (!url.contains("login") && !url.contains("checkout") && !url.contains("createuser")) {
 			String token = IOUtils.toString(context.getEntityStream(), "UTF-8");
 			System.out.println("FILTER CHECK : " + new Gson().fromJson(token, JsonSessionToken.class).token);
 			boolean auth;

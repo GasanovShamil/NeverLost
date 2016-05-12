@@ -2,6 +2,9 @@ package org.dant.db;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bson.Document;
 import org.dant.json.JsonConnectionBean;
 import org.dant.json.JsonSessionToken;
@@ -9,6 +12,8 @@ import org.dant.json.JsonSessionToken;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 
 public class DAOUserImpl implements DAOUser, Closeable {
 
@@ -68,29 +73,30 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	}
 
 	@Override
-	public boolean deleteUser(String email) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean deleteUser(JsonSessionToken token) {
+		DeleteResult deleteResult = usersCollection
+				.deleteOne(new Document("email", token.getEmail()).append("token", token.getToken()));
+		return deleteResult.wasAcknowledged();
 	}
 
 	@Override
-	public boolean addFriend(String email, String friend) {
-		Document user = null;
+	public boolean addFriend(JsonSessionToken token, String friend) {
+
 		boolean res = false;
-
 		if (userExists(friend)) {
-			user = usersCollection.find(new Document("email", email)).first();
-
-			res = true;
+			UpdateResult updateResult = usersCollection.updateOne(new Document("email", token.getEmail()),
+					new Document("$addToSet", new Document("friends", friend)));
+			res = updateResult.getModifiedCount()>1;
 		}
-
 		return res;
 	}
 
 	@Override
-	public boolean deleteFriend(String email, String friend) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean deleteFriend(JsonSessionToken token, String friend) {
+		UpdateResult updateResult = usersCollection.updateOne(new Document("email", token.getEmail()),
+				new Document("$pull", new Document("friends", friend)));
+
+		return updateResult.wasAcknowledged();
 	}
 
 	@Override
@@ -115,6 +121,15 @@ public class DAOUserImpl implements DAOUser, Closeable {
 			res = true;
 		}
 		return res;
+	}
+
+	@Override
+	public ArrayList<String> getFriendList(JsonSessionToken token) {
+		Document user = null;
+		user = usersCollection.find(new Document("email", token.getEmail()).append("token", token.getToken())).first();
+		@SuppressWarnings("unchecked")
+		ArrayList<String> friends = user.get("friends", ArrayList.class);
+		return friends;
 	}
 
 }
