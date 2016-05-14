@@ -1,7 +1,6 @@
 package org.dant.services;
 
 import java.io.IOException;
-import javax.annotation.ManagedBean;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

@@ -3,8 +3,6 @@ package org.dant.db;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-
 import org.bson.Document;
 import org.dant.json.JsonConnectionBean;
 import org.dant.json.JsonSessionToken;
@@ -60,7 +58,6 @@ public class DAOUserImpl implements DAOUser, Closeable {
 		Document user = null;
 		JsonSessionToken token = null;
 		user = usersCollection.find(new Document("email", bean.getEmail())).first();
-
 		if (user == null) {
 			token = new JsonSessionToken();
 			token.setEmail(bean.getEmail());
@@ -68,7 +65,6 @@ public class DAOUserImpl implements DAOUser, Closeable {
 			usersCollection.insertOne(new Document("email", bean.getEmail()).append("username", bean.getUsername())
 					.append("password", bean.getPassword()).append("token", token.getToken()));
 		}
-
 		return token;
 	}
 
@@ -83,10 +79,13 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	public boolean addFriend(JsonSessionToken token, String friend) {
 
 		boolean res = false;
-		if (userExists(friend)) {
+		User user = getUser(friend);
+		if (user != null) {
 			UpdateResult updateResult = usersCollection.updateOne(new Document("email", token.getEmail()),
-					new Document("$addToSet", new Document("friends", friend)));
-			res = updateResult.getModifiedCount()>1;
+					new Document("$addToSet", new Document("friends",
+							new Document("email", user.getEmail()).append("username", user.getUsername()))));
+			// res = updateResult.getModifiedCount()>1;
+			res = updateResult.wasAcknowledged();
 		}
 		return res;
 	}
@@ -94,7 +93,7 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	@Override
 	public boolean deleteFriend(JsonSessionToken token, String friend) {
 		UpdateResult updateResult = usersCollection.updateOne(new Document("email", token.getEmail()),
-				new Document("$pull", new Document("friends", friend)));
+				new Document("$pull", new Document("friends", new Document("email", friend))));
 
 		return updateResult.wasAcknowledged();
 	}
@@ -123,13 +122,29 @@ public class DAOUserImpl implements DAOUser, Closeable {
 		return res;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ArrayList<String> getFriendList(JsonSessionToken token) {
+	public User getUser(String email) {
+		Document user = null;
+		User userClass = null;
+		user = usersCollection.find(new Document("email", email)).first();
+
+		if (user != null) {
+			userClass = new User(user.getString("email"), user.getString("username"),
+					user.get("friends", ArrayList.class));
+		}
+		return userClass;
+	}
+
+	@Override
+	public ArrayList<Document> getFriendList(JsonSessionToken token) {
 		Document user = null;
 		user = usersCollection.find(new Document("email", token.getEmail()).append("token", token.getToken())).first();
 		@SuppressWarnings("unchecked")
-		ArrayList<String> friends = user.get("friends", ArrayList.class);
+		ArrayList<Document> friends = user.get("friends", ArrayList.class);
 		return friends;
 	}
+
+	
 
 }

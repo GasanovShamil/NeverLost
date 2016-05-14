@@ -1,8 +1,8 @@
 package org.dant.db;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import org.bson.Document;
 import org.dant.json.JsonConnectionBean;
 import org.dant.json.JsonSessionToken;
 
@@ -15,5 +15,6 @@ public interface DAOUser {
 	public boolean addFriend(JsonSessionToken token, String friend);
 	public boolean deleteFriend(JsonSessionToken token, String friend);
 	public boolean userExists(String email);
-	public ArrayList<String> getFriendList(JsonSessionToken token);
+	public ArrayList<Document> getFriendList(JsonSessionToken token);
+	public User getUser(String email);
 }
