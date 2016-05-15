@@ -1,14 +1,12 @@
 package org.dant.services;
 
-import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
+import javax.ejb.Stateless;
 import com.pusher.rest.Pusher;
 
-@RequestScoped
+@Stateless
 public class Sender {
 	public static String APP_KEY = "5102cb4079a2a7367004";
 	public static String APP_SECRET = "1a09ce5f0d01611a3344";
@@ -25,11 +23,17 @@ public class Sender {
 	}
 	
 	
-	public void send(List<String> channels, String lon, String lat ){
+	public void sendPosToFriends(List<String> channels, String lon, String lat ){
 		HashMap<String, String> data = new HashMap<String, String>();
 		data.put("lon", lon);
 		data.put("lat", lat);
 		pusher.trigger(channels, "coordinates", data);
+		
+	}
+	public void sendToOne(String channel, String event, String message){
+		HashMap<String, String> data = new HashMap<String, String>();
+		data.put("message", message);
+		pusher.trigger(channel, event, data);
 		
 	}
 }

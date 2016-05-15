@@ -12,9 +12,13 @@ public interface DAOUser {
 	public void logout(JsonSessionToken token);
 	public JsonSessionToken createUser(JsonConnectionBean bean);
 	public boolean deleteUser(JsonSessionToken token);
-	public boolean addFriend(JsonSessionToken token, String friend);
-	public boolean deleteFriend(JsonSessionToken token, String friend);
+	public boolean addFriend(String me, String friend);
+	public boolean deleteFriend(String me, String friend);
 	public boolean userExists(String email);
 	public ArrayList<Document> getFriendList(JsonSessionToken token);
 	public User getUser(String email);
+	public boolean requestFriend(String me, String friend);
+	public boolean confirmFriend(String me, String friend);
+	public boolean refuseFriend(String me, String friend);
+
 }

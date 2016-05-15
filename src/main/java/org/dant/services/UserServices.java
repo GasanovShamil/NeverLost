@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.ManagedBean;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -20,13 +20,14 @@ import org.dant.json.JsonConnectionBean;
 import org.dant.json.JsonSessionToken;
 
 import com.google.gson.Gson;
-//@ManagedBean
+
+@RequestScoped
 @Path("/services")
 public class UserServices {
-//	@Inject
-//	Sender s;
-	
-	
+
+	@Inject
+	Sender sender;
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -68,20 +69,41 @@ public class UserServices {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Path("/addfriend/{emailfriend}")
-	public Response addFriend(JsonSessionToken token, @PathParam("emailfriend") String emailfriend) {
+	@Path("/requestfriend/{emailfriend}")
+	public Response requestFriend(JsonSessionToken token, @PathParam("emailfriend") String emailfriend) {
 		boolean res;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
-			res = userDAO.addFriend(token, emailfriend);
+			res = userDAO.requestFriend(token.getEmail(), emailfriend);
 		} catch (IOException e) {
 			res = false;
 		}
 
 		if (res) {
-			System.out.println("User " + token.getEmail() + " added " + emailfriend + " to friends");
-			return Response.ok().entity("Friend added").build();
+			sender.sendToOne(emailfriend, "friendrequest", token.getEmail());
+			System.out.println("User " + token.getEmail() + " send to " + emailfriend + " friend request");
+			return Response.ok().entity("Request sended").build();
 		} else {
-			return Response.status(Response.Status.CONFLICT).entity("Add friend failed").build();
+			return Response.status(Response.Status.CONFLICT).entity("Request friend failed").build();
+		}
+	}
+
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/confirmfriend/{emailfriend}")
+	public Response confirmFriend(JsonSessionToken token, @PathParam("emailfriend") String emailfriend) {
+		boolean res;
+		try (DAOUserImpl userDAO = new DAOUserImpl()) {
+			res = userDAO.confirmFriend(token.getEmail(), emailfriend);
+		} catch (IOException e) {
+			res = false;
+		}
+
+		if (res) {
+			sender.sendToOne(emailfriend, "friendconfirm", token.getEmail());
+			System.out.println("User " + token.getEmail() + " send to " + emailfriend + " friend request");
+			return Response.ok().entity("Request sended").build();
+		} else {
+			return Response.status(Response.Status.CONFLICT).entity("Request friend failed").build();
 		}
 	}
 
@@ -91,7 +113,7 @@ public class UserServices {
 	public Response deleteFriend(JsonSessionToken token, @PathParam("emailfriend") String emailfriend) {
 		boolean res;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
-			res = userDAO.deleteFriend(token, emailfriend);
+			res = userDAO.deleteFriend(token.getEmail(), emailfriend);
 		} catch (IOException e) {
 			res = false;
 		}
@@ -115,42 +137,40 @@ public class UserServices {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		if (friends != null) {
-			for(int i = 0; i< friends.size(); i++){
+			for (int i = 0; i < friends.size(); i++) {
 				System.out.println(friends.get(i));
-			}	
-			//GenericEntity<ArrayList<String>> entity = new GenericEntity<ArrayList<String>>(friends) {};
+			}
+			// GenericEntity<ArrayList<String>> entity = new
+			// GenericEntity<ArrayList<String>>(friends) {};
 			return Response.ok(new Gson().toJson(friends)).build();
 		} else {
 			return Response.status(Response.Status.CONFLICT).entity("No friends LOOOSER").build();
 		}
 	}
-	
-	
-	
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/sendmypos/{lon}/{lat}")
 	public Response sendMyPos(JsonSessionToken token, @PathParam("lon") String lon, @PathParam("lat") String lat) {
-		
+
 		ArrayList<Document> friends = null;
-		List<String> channels=new ArrayList<String>();
-		Sender sender = new Sender();
-		
+		List<String> channels = new ArrayList<String>();
+
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
 			friends = userDAO.getFriendList(token);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if(friends != null){
-			 
-			for(Document doc : friends){
+		if (friends != null) {
+
+			for (Document doc : friends) {
 				channels.add(doc.getString("email"));
 			}
-			sender.send(channels, lon, lat);
+			sender.sendPosToFriends(channels, lon, lat);
+			return Response.ok().build();
 		}
-		return Response.ok().build();
+		return Response.status(Response.Status.CONFLICT).entity("No friends LOOOSER").build();
 	}
-	
+
 }
