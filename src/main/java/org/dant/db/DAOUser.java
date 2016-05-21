@@ -20,5 +20,6 @@ public interface DAOUser {
 	public boolean requestFriend(String me, String friend);
 	public boolean confirmFriend(String me, String friend);
 	public boolean refuseFriend(String me, String friend);
+	public ArrayList<User> getFriends(JsonSessionToken token);
 
 }

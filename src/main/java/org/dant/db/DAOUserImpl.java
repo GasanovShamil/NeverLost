@@ -148,6 +148,19 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	}
 
 	@Override
+	public ArrayList<User> getFriends(JsonSessionToken token) {
+		Document user = null;
+		user = usersCollection.find(new Document("email", token.getEmail()).append("token", token.getToken())).first();
+		@SuppressWarnings("unchecked")
+		ArrayList<Document> friendList = user.get("friends", ArrayList.class);
+		ArrayList<User> friends=new ArrayList<User>();
+		for (Document doc : friendList){
+			friends.add(getUser(doc.getString("email")));
+		}
+		return friends;
+	}
+	
+	@Override
 	public boolean requestFriend(String me, String friend) {
 		
 		boolean res = false;
@@ -190,8 +203,7 @@ public class DAOUserImpl implements DAOUser, Closeable {
 
 	@Override
 	public boolean refuseFriend(String me, String friend) {
-		// TODO Auto-generated method stub
-		return false;
+		return deleteFriend(me,friend);
 	}
 
 	

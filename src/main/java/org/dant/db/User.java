@@ -5,15 +5,16 @@ import java.util.ArrayList;
 import org.bson.Document;
 
 public class User {
-	private String email, username, lastPos;
+	private String email, username;
 	private ArrayList<Document> friends;
-	
-	public User(String email, String username, ArrayList<Document> friends){
-		this.email=email;
-		this.username=username;
-		this.friends=friends;
+	private double lat=0, lon=0;
+
+	public User(String email, String username, ArrayList<Document> friends) {
+		this.email = email;
+		this.username = username;
+		this.friends = friends;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
@@ -38,12 +39,20 @@ public class User {
 		this.friends = friends;
 	}
 
-	public String getLastPos() {
-		return lastPos;
+	public double getLat() {
+		return lat;
 	}
 
-	public void setLastPos(String lastPos) {
-		this.lastPos = lastPos;
+	public void setLat(double lat) {
+		this.lat = lat;
 	}
-	
+
+	public double getLon() {
+		return lon;
+	}
+
+	public void setLon(double lon) {
+		this.lon = lon;
+	}
+
 }

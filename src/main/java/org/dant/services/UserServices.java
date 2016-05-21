@@ -2,6 +2,7 @@ package org.dant.services;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Response;
 
 import org.bson.Document;
 import org.dant.db.DAOUserImpl;
+import org.dant.db.User;
 import org.dant.json.JsonConnectionBean;
 import org.dant.json.JsonSessionToken;
 
@@ -72,14 +74,20 @@ public class UserServices {
 	@Path("/requestfriend/{emailfriend}")
 	public Response requestFriend(JsonSessionToken token, @PathParam("emailfriend") String emailfriend) {
 		boolean res;
+		User me = null;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
+			me = userDAO.getUser(token.getEmail());
 			res = userDAO.requestFriend(token.getEmail(), emailfriend);
 		} catch (IOException e) {
 			res = false;
 		}
-
-		if (res) {
-			sender.sendToOne(emailfriend, "friendrequest", token.getEmail());
+		if (res && me != null) {
+			HashMap<String, String> data = new HashMap<String, String>();
+			data.put("email", me.getEmail());
+			data.put("username", me.getUsername());
+			ArrayList<String> channels = new ArrayList<String>();
+			channels.add(emailfriend);
+			sender.send(channels, "friendRequest", data);
 			System.out.println("User " + token.getEmail() + " send to " + emailfriend + " friend request");
 			return Response.ok().entity("Request sended").build();
 		} else {
@@ -92,14 +100,21 @@ public class UserServices {
 	@Path("/confirmfriend/{emailfriend}")
 	public Response confirmFriend(JsonSessionToken token, @PathParam("emailfriend") String emailfriend) {
 		boolean res;
+		User me = null;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
+			me = userDAO.getUser(token.getEmail());
 			res = userDAO.confirmFriend(token.getEmail(), emailfriend);
 		} catch (IOException e) {
 			res = false;
 		}
 
-		if (res) {
-			sender.sendToOne(emailfriend, "friendconfirm", token.getEmail());
+		if (res && me != null) {
+			HashMap<String, String> data = new HashMap<String, String>();
+			data.put("email", me.getEmail());
+			data.put("username", me.getUsername());
+			ArrayList<String> channels = new ArrayList<String>();
+			channels.add(emailfriend);
+			sender.send(channels, "friendConfirm", data);
 			System.out.println("User " + token.getEmail() + " send to " + emailfriend + " friend request");
 			return Response.ok().entity("Request sended").build();
 		} else {
@@ -131,9 +146,9 @@ public class UserServices {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/getfriendlist")
 	public Response getFriendList(JsonSessionToken token) {
-		ArrayList<Document> friends = null;
+		ArrayList<User> friends = null;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
-			friends = userDAO.getFriendList(token);
+			friends = userDAO.getFriends(token);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -155,7 +170,7 @@ public class UserServices {
 	public Response sendMyPos(JsonSessionToken token, @PathParam("lon") String lon, @PathParam("lat") String lat) {
 
 		ArrayList<Document> friends = null;
-		List<String> channels = new ArrayList<String>();
+		ArrayList<String> channels = new ArrayList<String>();
 
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
 			friends = userDAO.getFriendList(token);
@@ -165,9 +180,15 @@ public class UserServices {
 		if (friends != null) {
 
 			for (Document doc : friends) {
-				channels.add(doc.getString("email"));
+				if (doc.getInteger("confirmed") >= 1) {
+					channels.add(doc.getString("email"));
+				}
 			}
-			sender.sendPosToFriends(channels, lon, lat);
+			HashMap<String, String> data = new HashMap<String, String>();
+			data.put("email", token.getEmail());
+			data.put("lon", lon);
+			data.put("lat", lat);
+			sender.send(channels, "updatePos", data);
 			return Response.ok().build();
 		}
 		return Response.status(Response.Status.CONFLICT).entity("No friends LOOOSER").build();
