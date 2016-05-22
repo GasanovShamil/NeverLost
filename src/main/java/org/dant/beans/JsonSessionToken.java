@@ -1,4 +1,4 @@
-package org.dant.json;
+package org.dant.beans;
 
 import java.io.Serializable;
 import java.util.UUID;

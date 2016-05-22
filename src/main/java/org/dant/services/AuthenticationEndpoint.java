@@ -8,9 +8,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.dant.beans.JsonConnectionBean;
+import org.dant.beans.JsonSessionToken;
 import org.dant.db.DAOUserImpl;
-import org.dant.json.JsonConnectionBean;
-import org.dant.json.JsonSessionToken;
 
 @Path("/authentication")
 public class AuthenticationEndpoint {

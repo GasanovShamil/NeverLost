@@ -3,9 +3,12 @@ package org.dant.db;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+
 import org.bson.Document;
-import org.dant.json.JsonConnectionBean;
-import org.dant.json.JsonSessionToken;
+import org.dant.beans.JsonConnectionBean;
+import org.dant.beans.JsonSessionToken;
+import org.dant.beans.User;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -63,13 +66,20 @@ public class DAOUserImpl implements DAOUser, Closeable {
 			token.setEmail(bean.getEmail());
 			token.generateToken();
 			usersCollection.insertOne(new Document("email", bean.getEmail()).append("username", bean.getUsername())
-					.append("password", bean.getPassword()).append("token", token.getToken()));
+					.append("password", bean.getPassword()).append("token", token.getToken()).append("lon", 0.0)
+					.append("lat", 0.0).append("friends", new ArrayList<Document>()));
 		}
 		return token;
 	}
 
 	@Override
 	public boolean deleteUser(JsonSessionToken token) {
+		ArrayList<Document> friends = this.getFriendList(token.getEmail());
+		if (friends != null) {
+			for (Document doc : friends) {
+				deleteFriend(token.getEmail(), doc.getString("email"));
+			}
+		}
 		DeleteResult deleteResult = usersCollection
 				.deleteOne(new Document("email", token.getEmail()).append("token", token.getToken()));
 		return deleteResult.wasAcknowledged();
@@ -96,7 +106,7 @@ public class DAOUserImpl implements DAOUser, Closeable {
 				new Document("$pull", new Document("friends", new Document("email", friend))));
 		UpdateResult updateResult2 = usersCollection.updateOne(new Document("email", friend),
 				new Document("$pull", new Document("friends", new Document("email", me))));
-		
+
 		return updateResult1.wasAcknowledged() && updateResult2.wasAcknowledged();
 	}
 
@@ -127,51 +137,52 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	@SuppressWarnings("unchecked")
 	@Override
 	public User getUser(String email) {
-		Document user = null;
+		Document result = null;
 		User userClass = null;
-		user = usersCollection.find(new Document("email", email)).first();
+		result = usersCollection.find(new Document("email", email)).first();
 
-		if (user != null) {
-			userClass = new User(user.getString("email"), user.getString("username"),
-					user.get("friends", ArrayList.class));
+		if (result != null) {
+			userClass = new User(result.getString("email"), result.getString("username"));
+			userClass.setFriends(result.get("friends", ArrayList.class));
+			userClass.setDate(result.getDate("date"));
+			userClass.setLon(result.getDouble("lon"));
+			userClass.setLat(result.getDouble("lat"));
 		}
 		return userClass;
 	}
 
 	@Override
-	public ArrayList<Document> getFriendList(JsonSessionToken token) {
+	public ArrayList<Document> getFriendList(String email) {
 		Document user = null;
-		user = usersCollection.find(new Document("email", token.getEmail()).append("token", token.getToken())).first();
+		user = usersCollection.find(new Document("email", email)).first();
 		@SuppressWarnings("unchecked")
 		ArrayList<Document> friends = user.get("friends", ArrayList.class);
 		return friends;
 	}
 
 	@Override
-	public ArrayList<User> getFriends(JsonSessionToken token) {
+	public ArrayList<User> getFriends(String email) {
 		Document user = null;
-		user = usersCollection.find(new Document("email", token.getEmail()).append("token", token.getToken())).first();
+		user = usersCollection.find(new Document("email", email)).first();
 		@SuppressWarnings("unchecked")
 		ArrayList<Document> friendList = user.get("friends", ArrayList.class);
-		ArrayList<User> friends=new ArrayList<User>();
-		for (Document doc : friendList){
+		ArrayList<User> friends = new ArrayList<User>();
+		for (Document doc : friendList) {
 			friends.add(getUser(doc.getString("email")));
 		}
 		return friends;
 	}
-	
+
 	@Override
 	public boolean requestFriend(String me, String friend) {
-		
+
 		boolean res = false;
 		User user = getUser(friend);
 		if (user != null) {
-			UpdateResult updateResult1 = usersCollection.updateOne(new Document("email", me),
-					new Document("$addToSet", new Document("friends",
-							new Document("email", friend).append("confirmed", 0))));
-			UpdateResult updateResult2 = usersCollection.updateOne(new Document("email", friend),
-					new Document("$addToSet", new Document("friends",
-							new Document("email", me).append("confirmed", -1))));
+			UpdateResult updateResult1 = usersCollection.updateOne(new Document("email", me), new Document("$addToSet",
+					new Document("friends", new Document("email", friend).append("confirmed", 0))));
+			UpdateResult updateResult2 = usersCollection.updateOne(new Document("email", friend), new Document(
+					"$addToSet", new Document("friends", new Document("email", me).append("confirmed", -1))));
 			// res = updateResult.getModifiedCount()>1;
 			res = updateResult1.wasAcknowledged() && updateResult2.wasAcknowledged();
 		}
@@ -183,29 +194,32 @@ public class DAOUserImpl implements DAOUser, Closeable {
 		boolean res = false;
 		User user = getUser(friend);
 		if (user != null) {
-			UpdateResult updateResult1 = usersCollection.updateOne(new Document("email", me),
-					new Document("$pull", new Document("friends",
-							new Document("email", friend).append("confirmed", -1))));
-			UpdateResult updateResult2 = usersCollection.updateOne(new Document("email", me),
-					new Document("$addToSet", new Document("friends",
-							new Document("email", friend).append("confirmed", 1))));
+			UpdateResult updateResult1 = usersCollection.updateOne(new Document("email", me), new Document("$pull",
+					new Document("friends", new Document("email", friend).append("confirmed", -1))));
+			UpdateResult updateResult2 = usersCollection.updateOne(new Document("email", me), new Document("$addToSet",
+					new Document("friends", new Document("email", friend).append("confirmed", 1))));
 			UpdateResult updateResult3 = usersCollection.updateOne(new Document("email", friend),
-					new Document("$pull", new Document("friends",
-							new Document("email", me).append("confirmed", 0))));
-			UpdateResult updateResult4 = usersCollection.updateOne(new Document("email", friend),
-					new Document("$addToSet", new Document("friends",
-							new Document("email", me).append("confirmed", 1))));
+					new Document("$pull", new Document("friends", new Document("email", me).append("confirmed", 0))));
+			UpdateResult updateResult4 = usersCollection.updateOne(new Document("email", friend), new Document(
+					"$addToSet", new Document("friends", new Document("email", me).append("confirmed", 1))));
 			// res = updateResult.getModifiedCount()>1;
-			res = updateResult1.wasAcknowledged() && updateResult2.wasAcknowledged() && updateResult3.wasAcknowledged() && updateResult4.wasAcknowledged();
+			res = updateResult1.wasAcknowledged() && updateResult2.wasAcknowledged() && updateResult3.wasAcknowledged()
+					&& updateResult4.wasAcknowledged();
 		}
 		return res;
 	}
 
 	@Override
 	public boolean refuseFriend(String me, String friend) {
-		return deleteFriend(me,friend);
+		return deleteFriend(me, friend);
 	}
 
-	
+	@Override
+	public boolean setUserPos(String email, Date date, String lon, String lat) {
+		UpdateResult updateResult = usersCollection.updateOne(new Document("email", email),
+				new Document("$set", new Document("lon", lon).append("lat", lat).append("date", date)));
+
+		return updateResult.wasAcknowledged();
+	}
 
 }

@@ -2,9 +2,8 @@ package org.dant.services;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -16,10 +15,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.bson.Document;
+import org.dant.beans.JsonConnectionBean;
+import org.dant.beans.JsonSessionToken;
+import org.dant.beans.User;
 import org.dant.db.DAOUserImpl;
-import org.dant.db.User;
-import org.dant.json.JsonConnectionBean;
-import org.dant.json.JsonSessionToken;
 
 import com.google.gson.Gson;
 
@@ -66,6 +65,25 @@ public class UserServices {
 			return Response.ok(token).entity("User " + token.getEmail() + ", was deleted").build();
 		} else {
 			return Response.status(Response.Status.CONFLICT).entity("User already exist.").build();
+		}
+	}
+
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/findfriend/{emailfriend}")
+	public Response findFriend(JsonSessionToken token, @PathParam("emailfriend") String emailfriend) {
+
+		User friend = null;
+		try (DAOUserImpl userDAO = new DAOUserImpl()) {
+			friend = userDAO.getUser(emailfriend);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (friend != null) {
+			return Response.ok(new Gson().toJson(friend)).build();
+		} else {
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 	}
 
@@ -139,7 +157,6 @@ public class UserServices {
 		} else {
 			return Response.status(Response.Status.CONFLICT).entity("Delete friend failed").build();
 		}
-
 	}
 
 	@POST
@@ -148,7 +165,7 @@ public class UserServices {
 	public Response getFriendList(JsonSessionToken token) {
 		ArrayList<User> friends = null;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
-			friends = userDAO.getFriends(token);
+			friends = userDAO.getFriends(token.getEmail());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -171,9 +188,10 @@ public class UserServices {
 
 		ArrayList<Document> friends = null;
 		ArrayList<String> channels = new ArrayList<String>();
-
+		Date date = new Date();
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
-			friends = userDAO.getFriendList(token);
+			friends = userDAO.getFriendList(token.getEmail());
+			userDAO.setUserPos(token.getEmail(), date, lon, lat);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -186,8 +204,9 @@ public class UserServices {
 			}
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", token.getEmail());
-			data.put("lon", lon);
-			data.put("lat", lat);
+			data.put("date", date.toString());
+			data.put("lon", "" + lon);
+			data.put("lat", "" + lat);
 			sender.send(channels, "updatePos", data);
 			return Response.ok().build();
 		}

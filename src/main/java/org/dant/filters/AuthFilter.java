@@ -7,8 +7,8 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import org.apache.commons.io.IOUtils;
+import org.dant.beans.JsonSessionToken;
 import org.dant.db.DAOUserImpl;
-import org.dant.json.JsonSessionToken;
 
 import com.google.gson.Gson;
 
