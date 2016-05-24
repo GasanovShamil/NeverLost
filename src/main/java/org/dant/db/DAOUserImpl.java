@@ -168,7 +168,9 @@ public class DAOUserImpl implements DAOUser, Closeable {
 		ArrayList<Document> friendList = user.get("friends", ArrayList.class);
 		ArrayList<User> friends = new ArrayList<User>();
 		for (Document doc : friendList) {
-			friends.add(getUser(doc.getString("email")));
+			User tmp=getUser(doc.getString("email"));
+			tmp.setConfirmed(doc.getInteger("confirmed"));
+			friends.add(tmp);
 		}
 		return friends;
 	}
@@ -177,8 +179,9 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	public boolean requestFriend(String me, String friend) {
 
 		boolean res = false;
-		User user = getUser(friend);
-		if (user != null) {
+		User friendUser = getUser(friend);
+		User meUser = getUser(me);
+		if (friendUser != null) {
 			UpdateResult updateResult1 = usersCollection.updateOne(new Document("email", me), new Document("$addToSet",
 					new Document("friends", new Document("email", friend).append("confirmed", 0))));
 			UpdateResult updateResult2 = usersCollection.updateOne(new Document("email", friend), new Document(

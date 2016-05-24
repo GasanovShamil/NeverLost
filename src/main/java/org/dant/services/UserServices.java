@@ -103,6 +103,8 @@ public class UserServices {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", me.getEmail());
 			data.put("username", me.getUsername());
+			data.put("lat", ""+me.getLat());
+			data.put("lon", ""+me.getLon());
 			ArrayList<String> channels = new ArrayList<String>();
 			channels.add(emailfriend);
 			sender.send(channels, "friendRequest", data);
@@ -130,6 +132,8 @@ public class UserServices {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", me.getEmail());
 			data.put("username", me.getUsername());
+			data.put("lat", ""+me.getLat());
+			data.put("lon", ""+me.getLon());
 			ArrayList<String> channels = new ArrayList<String>();
 			channels.add(emailfriend);
 			sender.send(channels, "friendConfirm", data);

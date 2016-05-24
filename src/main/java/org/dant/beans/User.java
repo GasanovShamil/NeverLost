@@ -8,6 +8,7 @@ public class User {
 	private ArrayList<User> friends;
 	private double lon,lat;
 	private Date date;
+	private int confirmed;
 
 	
 	
@@ -67,6 +68,14 @@ public class User {
 
 	public void setLat(double lat) {
 		this.lat = lat;
+	}
+
+	public int getConfirmed() {
+		return confirmed;
+	}
+
+	public void setConfirmed(int confirmed) {
+		this.confirmed = confirmed;
 	}
 
 	
