@@ -188,7 +188,7 @@ public class UserServices {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/sendmypos/{lon}/{lat}")
-	public Response sendMyPos(JsonSessionToken token, @PathParam("lon") String lon, @PathParam("lat") String lat) {
+	public Response sendMyPos(JsonSessionToken token, @PathParam("lon") double lon, @PathParam("lat") double lat) {
 
 		ArrayList<Document> friends = null;
 		ArrayList<String> channels = new ArrayList<String>();

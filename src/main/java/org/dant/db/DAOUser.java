@@ -23,5 +23,5 @@ public interface DAOUser {
 	public boolean confirmFriend(String me, String friend);
 	public boolean refuseFriend(String me, String friend);
 	public ArrayList<User> getFriends(String email);
-	public boolean setUserPos(String email,Date date, String lon, String lat);
+	public boolean setUserPos(String email,Date date, double lon, double lat);
 }

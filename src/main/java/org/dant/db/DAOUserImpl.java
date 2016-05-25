@@ -218,7 +218,7 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	}
 
 	@Override
-	public boolean setUserPos(String email, Date date, String lon, String lat) {
+	public boolean setUserPos(String email, Date date, double lon, double lat) {
 		UpdateResult updateResult = usersCollection.updateOne(new Document("email", email),
 				new Document("$set", new Document("lon", lon).append("lat", lat).append("date", date)));
 
