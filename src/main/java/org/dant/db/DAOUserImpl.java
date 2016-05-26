@@ -168,7 +168,7 @@ public class DAOUserImpl implements DAOUser, Closeable {
 		ArrayList<Document> friendList = user.get("friends", ArrayList.class);
 		ArrayList<User> friends = new ArrayList<User>();
 		for (Document doc : friendList) {
-			User tmp=getUser(doc.getString("email"));
+			User tmp = getUser(doc.getString("email"));
 			tmp.setConfirmed(doc.getInteger("confirmed"));
 			friends.add(tmp);
 		}
@@ -196,15 +196,19 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	public boolean confirmFriend(String me, String friend) {
 		boolean res = false;
 		User user = getUser(friend);
+		UpdateResult updateResult1 = null;
+		UpdateResult updateResult2 = null;
+		UpdateResult updateResult3 = null;
+		UpdateResult updateResult4 = null;
 		if (user != null) {
-			UpdateResult updateResult1 = usersCollection.updateOne(new Document("email", me), new Document("$pull",
+			updateResult1 = usersCollection.updateOne(new Document("email", me), new Document("$pull",
 					new Document("friends", new Document("email", friend).append("confirmed", -1))));
-			UpdateResult updateResult2 = usersCollection.updateOne(new Document("email", me), new Document("$addToSet",
-					new Document("friends", new Document("email", friend).append("confirmed", 1))));
-			UpdateResult updateResult3 = usersCollection.updateOne(new Document("email", friend),
+			updateResult2 = usersCollection.updateOne(new Document("email", me), new Document("$addToSet",
+						new Document("friends", new Document("email", friend).append("confirmed", 1))));
+			updateResult3 = usersCollection.updateOne(new Document("email", friend),
 					new Document("$pull", new Document("friends", new Document("email", me).append("confirmed", 0))));
-			UpdateResult updateResult4 = usersCollection.updateOne(new Document("email", friend), new Document(
-					"$addToSet", new Document("friends", new Document("email", me).append("confirmed", 1))));
+			updateResult4 = usersCollection.updateOne(new Document("email", friend), new Document("$addToSet",
+						new Document("friends", new Document("email", me).append("confirmed", 1))));
 			// res = updateResult.getModifiedCount()>1;
 			res = updateResult1.wasAcknowledged() && updateResult2.wasAcknowledged() && updateResult3.wasAcknowledged()
 					&& updateResult4.wasAcknowledged();
