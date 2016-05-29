@@ -6,6 +6,7 @@ import java.util.Date;
 import org.bson.Document;
 
 import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 public class MongoTest {
@@ -19,26 +20,22 @@ public class MongoTest {
 
 			// Now connect to your databases
 			MongoDatabase db = mongoClient.getDatabase("neverlost");
-
-			db.getCollection("users").drop();
-			db.getCollection("users")
-					.insertOne(new Document("email", "shamil@mail.com").append("username", "shamilevich")
+			MongoCollection<Document> collection = db.getCollection("users");
+			collection.drop();
+			collection.createIndex(new Document("name",1));
+			collection.insertOne(new Document("email", "shamil@mail.com").append("username", "shamilevich")
 							.append("password", "shamil").append("lon", 0.0).append("lat", 0.0)
 							.append("friends", new ArrayList<Document>()).append("date", new Date()));
-			db.getCollection("users")
-					.insertOne(new Document("email", "leo@mail.com").append("username", "machallah")
+			collection.insertOne(new Document("email", "leo@mail.com").append("username", "machallah")
 							.append("password", "leo").append("lon", 0.0).append("lat", 0.0)
 							.append("friends", new ArrayList<Document>()).append("date", new Date()));
-			db.getCollection("users")
-					.insertOne(new Document("email", "milan@mail.com").append("username", "bubachvaba")
+			collection.insertOne(new Document("email", "milan@mail.com").append("username", "bubachvaba")
 					.append("password", "milan").append("lon", 0.0).append("lat", 0.0)
 					.append("friends", new ArrayList<Document>()).append("date", new Date()));
-			db.getCollection("users")
-					.insertOne(new Document("email", "ibra@mail.com").append("username", "brambaba")
+			collection.insertOne(new Document("email", "ibra@mail.com").append("username", "brambaba")
 							.append("password", "ibra").append("lon", 0.0).append("lat", 0.0)
 							.append("friends", new ArrayList<Document>()).append("date", new Date()));
-			db.getCollection("users")
-			.insertOne(new Document("email", "khaled@mail.com").append("username", "bouboubond")
+			collection.insertOne(new Document("email", "khaled@mail.com").append("username", "bouboubond")
 					.append("password", "khaled").append("lon", 0.0).append("lat", 0.0)
 					.append("friends", new ArrayList<Document>()).append("date", new Date()));
 			mongoClient.close();

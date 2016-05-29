@@ -2,8 +2,6 @@ package org.dant.beans;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 
 public class JsonConnectionBean implements Serializable {
 

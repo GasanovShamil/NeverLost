@@ -6,6 +6,7 @@ import java.util.Date;
 import org.bson.Document;
 import org.dant.beans.JsonConnectionBean;
 import org.dant.beans.JsonSessionToken;
+import org.dant.beans.UpdateBean;
 import org.dant.beans.User;
 
 public interface DAOUser {
@@ -13,6 +14,7 @@ public interface DAOUser {
 	public boolean checkout(JsonSessionToken token);
 	public void logout(JsonSessionToken token);
 	public JsonSessionToken createUser(JsonConnectionBean bean);
+	public boolean updateUser(UpdateBean updateBean);
 	public boolean deleteUser(JsonSessionToken token);
 	public boolean addFriend(String me, String friend);
 	public boolean deleteFriend(String me, String friend);

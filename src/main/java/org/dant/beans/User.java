@@ -1,11 +1,16 @@
 package org.dant.beans;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
 import org.bson.Document;
 
-public class User {
+public class User implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5420434289477335204L;
 	private String email, username;
 	private ArrayList<Document> friends;
 	private double lon,lat;

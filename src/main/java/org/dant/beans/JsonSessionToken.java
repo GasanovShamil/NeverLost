@@ -3,8 +3,6 @@ package org.dant.beans;
 import java.io.Serializable;
 import java.util.UUID;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 
 public class JsonSessionToken implements Serializable {
 	

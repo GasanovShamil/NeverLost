@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import org.bson.Document;
 import org.dant.beans.JsonConnectionBean;
 import org.dant.beans.JsonSessionToken;
+import org.dant.beans.UpdateBean;
 import org.dant.beans.User;
 import org.dant.db.DAOUserImpl;
 
@@ -48,6 +49,26 @@ public class UserServices {
 			return Response.ok(token).build();
 		} else {
 			return Response.status(Response.Status.CONFLICT).entity("User already exist.").build();
+		}
+	}
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/updateuser")
+	public Response updateUser(UpdateBean updateBean) {
+
+		boolean res;
+		try (DAOUserImpl userDAO = new DAOUserImpl()) {
+			res = userDAO.updateUser(updateBean);
+		} catch (IOException e) {
+			res = false;
+		}
+
+		if (res) {
+			System.out.println("User : " + updateBean.getEmail() + " - updated");
+			return Response.ok().build();
+		} else {
+			return Response.status(Response.Status.CONFLICT).build();
 		}
 	}
 
