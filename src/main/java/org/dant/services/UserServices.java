@@ -1,6 +1,7 @@
 package org.dant.services;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -195,6 +196,7 @@ public class UserServices {
 		ArrayList<Document> friends = null;
 		ArrayList<String> channels = new ArrayList<String>();
 		Date date = new Date();
+		DateFormat shortDate = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT);
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
 			user = userDAO.getUser(token.getEmail());
 			friends = user.getFriends();
@@ -211,7 +213,7 @@ public class UserServices {
 			}
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", token.getEmail());
-			data.put("date", date.toString());
+			data.put("date", shortDate.format(date));
 			data.put("lon", "" + lon);
 			data.put("lat", "" + lat);
 			sender.send(channels, "updatePos", data);

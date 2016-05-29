@@ -181,10 +181,11 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	public boolean requestFriend(String me, String friend) {
 
 		boolean res = false;
-		User friendUser = getUser(friend);
-		User meUser = getUser(me);
-		if (friendUser != null) {
-
+		Document friendInList = usersCollection.find(new Document("email", me).append("friends.email", friend)).first();
+		
+		
+		if(getUser(friend)!=null && friendInList==null){
+			
 			UpdateResult updateResult1 = usersCollection.updateOne(new Document("email", me), new Document("$addToSet",
 					new Document("friends", new Document("email", friend).append("confirmed", 0))));
 			UpdateResult updateResult2 = usersCollection.updateOne(new Document("email", friend), new Document(
