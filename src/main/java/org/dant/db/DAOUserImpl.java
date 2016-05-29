@@ -148,19 +148,19 @@ public class DAOUserImpl implements DAOUser, Closeable {
 			userClass.setDate(result.getDate("date"));
 			userClass.setLon(result.getDouble("lon"));
 			userClass.setLat(result.getDouble("lat"));
-//			userClass = new Gson().fromJson(result.toJson(), User.class);
+			// userClass = new Gson().fromJson(result.toJson(), User.class);
 		}
 		return userClass;
 	}
 
-//	@Override
-//	public ArrayList<Document> getFriendList(String email) {
-//		Document user = null;
-//		user = usersCollection.find(new Document("email", email)).first();
-//		@SuppressWarnings("unchecked")
-//		ArrayList<Document> friends = user.get("friends", ArrayList.class);
-//		return friends;
-//	}
+	// @Override
+	// public ArrayList<Document> getFriendList(String email) {
+	// Document user = null;
+	// user = usersCollection.find(new Document("email", email)).first();
+	// @SuppressWarnings("unchecked")
+	// ArrayList<Document> friends = user.get("friends", ArrayList.class);
+	// return friends;
+	// }
 
 	@Override
 	public ArrayList<User> getFriends(String email) {
@@ -184,6 +184,7 @@ public class DAOUserImpl implements DAOUser, Closeable {
 		User friendUser = getUser(friend);
 		User meUser = getUser(me);
 		if (friendUser != null) {
+
 			UpdateResult updateResult1 = usersCollection.updateOne(new Document("email", me), new Document("$addToSet",
 					new Document("friends", new Document("email", friend).append("confirmed", 0))));
 			UpdateResult updateResult2 = usersCollection.updateOne(new Document("email", friend), new Document(
@@ -202,18 +203,34 @@ public class DAOUserImpl implements DAOUser, Closeable {
 		UpdateResult updateResult2 = null;
 		UpdateResult updateResult3 = null;
 		UpdateResult updateResult4 = null;
+//		if (user != null) {
+//			updateResult1 = usersCollection.updateOne(new Document("email", me), new Document("$pull",
+//					new Document("friends", new Document("email", friend).append("confirmed", -1))));
+//
+//			updateResult2 = usersCollection.updateOne(new Document("email", friend),
+//					new Document("$pull", new Document("friends", new Document("email", me).append("confirmed", 0))));
+//
+//			if (updateResult1.getModifiedCount() > 0 && updateResult2.getModifiedCount() > 0) {
+//				updateResult3 = usersCollection.updateOne(new Document("email", me), new Document("$addToSet",
+//						new Document("friends", new Document("email", friend).append("confirmed", 1))));
+//
+//				updateResult4 = usersCollection.updateOne(new Document("email", friend), new Document("$addToSet",
+//						new Document("friends", new Document("email", me).append("confirmed", 1))));
+//				res = updateResult3.wasAcknowledged() && updateResult4.wasAcknowledged();
+//			}
+//			// res = updateResult.getModifiedCount()>1;
+//
+//		}
 		if (user != null) {
-			updateResult1 = usersCollection.updateOne(new Document("email", me), new Document("$pull",
-					new Document("friends", new Document("email", friend).append("confirmed", -1))));
-			updateResult2 = usersCollection.updateOne(new Document("email", me), new Document("$addToSet",
-						new Document("friends", new Document("email", friend).append("confirmed", 1))));
-			updateResult3 = usersCollection.updateOne(new Document("email", friend),
-					new Document("$pull", new Document("friends", new Document("email", me).append("confirmed", 0))));
-			updateResult4 = usersCollection.updateOne(new Document("email", friend), new Document("$addToSet",
-						new Document("friends", new Document("email", me).append("confirmed", 1))));
-			// res = updateResult.getModifiedCount()>1;
-			res = updateResult1.wasAcknowledged() && updateResult2.wasAcknowledged() && updateResult3.wasAcknowledged()
-					&& updateResult4.wasAcknowledged();
+			updateResult1 = usersCollection.updateOne(new Document("email", me).append("friends.email", friend).append("friends.confirmed", -1), new Document("$set",
+					new Document("friends.$.confirmed", 1)));
+
+			updateResult2 = usersCollection.updateOne(new Document("email", friend).append("friends.email", me).append("friends.confirmed", 0),
+					new Document("$set", new Document("friends.$.confirmed", 1)));
+
+			
+			res = updateResult1.getModifiedCount()>0 && updateResult2.getModifiedCount()>0;
+
 		}
 		return res;
 	}

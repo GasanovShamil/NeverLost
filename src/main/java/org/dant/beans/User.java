@@ -10,7 +10,7 @@ public class User {
 	private ArrayList<Document> friends;
 	private double lon,lat;
 	private Date date;
-	private int confirmed;
+	private Integer confirmed;
 
 	
 	
@@ -72,11 +72,11 @@ public class User {
 		this.lat = lat;
 	}
 
-	public int getConfirmed() {
+	public Integer getConfirmed() {
 		return confirmed;
 	}
 
-	public void setConfirmed(int confirmed) {
+	public void setConfirmed(Integer confirmed) {
 		this.confirmed = confirmed;
 	}
 
