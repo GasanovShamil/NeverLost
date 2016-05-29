@@ -3,9 +3,11 @@ package org.dant.beans;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.bson.Document;
+
 public class User {
 	private String email, username;
-	private ArrayList<User> friends;
+	private ArrayList<Document> friends;
 	private double lon,lat;
 	private Date date;
 	private int confirmed;
@@ -16,7 +18,7 @@ public class User {
 		this.email = email;
 		this.username = username;
 		this.date = new Date();
-		this.friends = new ArrayList<User>();
+		this.friends = new ArrayList<Document>();
 		this.lon=0.0;
 		this.lat=0.0;
 	}
@@ -37,11 +39,11 @@ public class User {
 		this.username = username;
 	}
 
-	public ArrayList<User> getFriends() {
+	public ArrayList<Document> getFriends() {
 		return friends;
 	}
 
-	public void setFriends(ArrayList<User> friends) {
+	public void setFriends(ArrayList<Document> friends) {
 		this.friends = friends;
 	}
 

@@ -10,6 +10,7 @@ import org.dant.beans.JsonConnectionBean;
 import org.dant.beans.JsonSessionToken;
 import org.dant.beans.User;
 
+import com.google.gson.Gson;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -74,7 +75,7 @@ public class DAOUserImpl implements DAOUser, Closeable {
 
 	@Override
 	public boolean deleteUser(JsonSessionToken token) {
-		ArrayList<Document> friends = this.getFriendList(token.getEmail());
+		ArrayList<Document> friends = this.getUser(token.getEmail()).getFriends();
 		if (friends != null) {
 			for (Document doc : friends) {
 				deleteFriend(token.getEmail(), doc.getString("email"));
@@ -147,18 +148,19 @@ public class DAOUserImpl implements DAOUser, Closeable {
 			userClass.setDate(result.getDate("date"));
 			userClass.setLon(result.getDouble("lon"));
 			userClass.setLat(result.getDouble("lat"));
+//			userClass = new Gson().fromJson(result.toJson(), User.class);
 		}
 		return userClass;
 	}
 
-	@Override
-	public ArrayList<Document> getFriendList(String email) {
-		Document user = null;
-		user = usersCollection.find(new Document("email", email)).first();
-		@SuppressWarnings("unchecked")
-		ArrayList<Document> friends = user.get("friends", ArrayList.class);
-		return friends;
-	}
+//	@Override
+//	public ArrayList<Document> getFriendList(String email) {
+//		Document user = null;
+//		user = usersCollection.find(new Document("email", email)).first();
+//		@SuppressWarnings("unchecked")
+//		ArrayList<Document> friends = user.get("friends", ArrayList.class);
+//		return friends;
+//	}
 
 	@Override
 	public ArrayList<User> getFriends(String email) {

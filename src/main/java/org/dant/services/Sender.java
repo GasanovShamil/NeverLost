@@ -11,11 +11,16 @@ public class Sender {
 	public final String APP_SECRET = "1a09ce5f0d01611a3344";
 	public final String APP_ID = "195820";
 	public final String APP_CLUSTER = "eu";
+	
+	public static String APP_KEY_V2 = "badd279471eca66c0f77";
+	public static String APP_SECRET_V2 = "bb0cd4baa5fc0cedcf99";
+	public static String APP_ID_V2 = "210964";
+	
 	Pusher pusher;
 
 	public Sender() {
-		pusher = new Pusher(APP_ID, APP_KEY, APP_SECRET);
-		pusher.setCluster(APP_CLUSTER);
+		pusher = new Pusher(APP_ID_V2, APP_KEY_V2, APP_SECRET_V2);
+		//pusher.setCluster(APP_CLUSTER);
 		pusher.setEncrypted(true);
 
 	}

@@ -168,8 +168,10 @@ public class UserServices {
 	@Path("/getfriendlist")
 	public Response getFriendList(JsonSessionToken token) {
 		ArrayList<User> friends = null;
+		User u = null;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
 			friends = userDAO.getFriends(token.getEmail());
+			u=userDAO.getUser(token.getEmail());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -181,7 +183,7 @@ public class UserServices {
 			// GenericEntity<ArrayList<String>>(friends) {};
 			return Response.ok(new Gson().toJson(friends)).build();
 		} else {
-			return Response.status(Response.Status.CONFLICT).entity("No friends LOOOSER").build();
+			return Response.status(Response.Status.NOT_FOUND).entity("No friends LOOOSER").build();
 		}
 	}
 
@@ -189,21 +191,22 @@ public class UserServices {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/sendmypos/{lon}/{lat}")
 	public Response sendMyPos(JsonSessionToken token, @PathParam("lon") double lon, @PathParam("lat") double lat) {
-
+		User user = null;
 		ArrayList<Document> friends = null;
 		ArrayList<String> channels = new ArrayList<String>();
 		Date date = new Date();
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
-			friends = userDAO.getFriendList(token.getEmail());
+			user = userDAO.getUser(token.getEmail());
+			friends = user.getFriends();
 			userDAO.setUserPos(token.getEmail(), date, lon, lat);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (friends != null) {
+		if (!friends.isEmpty()) {
 
-			for (Document doc : friends) {
-				if (doc.getInteger("confirmed") >= 1) {
-					channels.add(doc.getString("email"));
+			for (Document tmp : friends) {
+				if (tmp.getInteger("confirmed") >= 1) {
+					channels.add(tmp.getString("email"));
 				}
 			}
 			HashMap<String, String> data = new HashMap<String, String>();
@@ -214,7 +217,7 @@ public class UserServices {
 			sender.send(channels, "updatePos", data);
 			return Response.ok().build();
 		}
-		return Response.status(Response.Status.CONFLICT).entity("No friends LOOOSER").build();
+		return Response.status(Response.Status.NOT_FOUND).entity("No friends LOOOSER").build();
 	}
 
 }

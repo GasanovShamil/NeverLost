@@ -17,7 +17,6 @@ public interface DAOUser {
 	public boolean addFriend(String me, String friend);
 	public boolean deleteFriend(String me, String friend);
 	public boolean userExists(String email);
-	public ArrayList<Document> getFriendList(String email);
 	public User getUser(String email);
 	public boolean requestFriend(String me, String friend);
 	public boolean confirmFriend(String me, String friend);
