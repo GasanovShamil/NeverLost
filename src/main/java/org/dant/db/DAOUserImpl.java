@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.ws.rs.core.Response;
+
 import org.bson.Document;
 import org.dant.beans.JsonConnectionBean;
 import org.dant.beans.JsonSessionToken;
@@ -120,15 +122,20 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	}
 
 	@Override
-	public boolean checkout(JsonSessionToken token) {
+	public Response.Status checkout(JsonSessionToken token) {
 		Document user = null;
 		boolean res = false;
 		user = usersCollection.find(new Document("email", token.getEmail()).append("token", token.getToken())).first();
-
-		if (user != null) {
-			res = true;
+		
+		if (user == null) {
+			return Response.Status.UNAUTHORIZED;			
+		}else if(!user.getBoolean("active")){
+			return Response.Status.FORBIDDEN;
+		}else{
+			return Response.Status.OK;
 		}
-		return res;
+		
+		
 	}
 
 	@Override

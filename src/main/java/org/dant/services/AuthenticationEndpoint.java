@@ -52,17 +52,14 @@ public class AuthenticationEndpoint {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/checkout")
 	public Response checkoutUser(JsonSessionToken token) {
-		boolean res=false;
+
+		Response.Status response;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
-			res=userDAO.checkout(token);
+			response = userDAO.checkout(token);
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		if(res){
-		return Response.status(Response.Status.OK).build();
-		}else{
-			return Response.status(Response.Status.UNAUTHORIZED).build();
+			response = Response.Status.CONFLICT;
 		}
 
+		return Response.status(response).build();
 	}
 }

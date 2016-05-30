@@ -3,6 +3,8 @@ package org.dant.db;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.ws.rs.core.Response;
+
 import org.bson.Document;
 import org.dant.beans.JsonConnectionBean;
 import org.dant.beans.JsonSessionToken;
@@ -10,7 +12,7 @@ import org.dant.beans.User;
 
 public interface DAOUser {
 	public JsonSessionToken login(JsonConnectionBean bean);
-	public boolean checkout(JsonSessionToken token);
+	public Response.Status checkout(JsonSessionToken token);
 	public void logout(JsonSessionToken token);
 	public JsonSessionToken createUser(JsonConnectionBean bean);
 	public boolean updateUser(User bean);

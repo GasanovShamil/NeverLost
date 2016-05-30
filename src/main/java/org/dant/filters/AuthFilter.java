@@ -19,20 +19,21 @@ public class AuthFilter implements ContainerRequestFilter {
 	public void filter(ContainerRequestContext context) throws IOException {
 		String url = context.getUriInfo().getPath();
 
-		if (!url.contains("login") && !url.contains("checkout") && !url.contains("createuser")) {
+		if (!url.contains("login") && !url.contains("checkout") && !url.contains("createuser")  && !url.contains("confirmemail")) {
 			String data = IOUtils.toString(context.getEntityStream(), "UTF-8");
 			System.out.println("FILTER CHECK : " + new Gson().fromJson(data, JsonSessionToken.class).token);
 			boolean auth;
+			Response.Status response;
 			try (DAOUserImpl userDAO = new DAOUserImpl()) {
-				auth = userDAO.checkout(new Gson().fromJson(data, JsonSessionToken.class));
+				response = userDAO.checkout(new Gson().fromJson(data, JsonSessionToken.class));
 			}
-			if (!auth) {
-				context.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity("User cannot access the resource.").build());
-				return;
-			} else {
+			if (response == Response.Status.OK) {
 				InputStream in = IOUtils.toInputStream(data, "UTF-8");
 
 				context.setEntityStream(in);
+			} else {
+				context.abortWith(Response.status(response).entity("User cannot access the resource.").build());
+				return;
 			}
 
 		}
