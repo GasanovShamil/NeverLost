@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -40,16 +41,16 @@ public class UserServices {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/createuser")
 	public Response createUser(JsonConnectionBean bean) {
-
+		String confirmemail = UUID.randomUUID().toString();
 		JsonSessionToken token;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
-			token = userDAO.createUser(bean);
+			token = userDAO.createUser(bean, confirmemail);
 		} catch (IOException e) {
 			token = null;
 		}
-
 		if (token != null) {
 			System.out.println("User created : " + bean.getEmail() + ", password : " + bean.getPassword());
+			MailSender.sendEmail(bean.getEmail(), confirmemail);
 			return Response.ok(token).build();
 		} else {
 			return Response.status(Response.Status.CONFLICT).entity("User already exist.").build();

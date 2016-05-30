@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -62,7 +63,7 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	}
 
 	@Override
-	public JsonSessionToken createUser(JsonConnectionBean bean) {
+	public JsonSessionToken createUser(JsonConnectionBean bean, String confirmemail) {
 		Document user = null;
 		JsonSessionToken token = null;
 		user = usersCollection.find(new Document("email", bean.getEmail())).first();
@@ -71,23 +72,30 @@ public class DAOUserImpl implements DAOUser, Closeable {
 			token.setEmail(bean.getEmail());
 			token.generateToken();
 			usersCollection.insertOne(new Document("email", bean.getEmail()).append("username", bean.getUsername())
-					.append("password", bean.getPassword()).append("confirmemail", token.getToken()).append("lon", 0.0)
-					.append("lat", 0.0).append("friends", new ArrayList<Document>()).append("active", false));
+					.append("password", bean.getPassword()).append("token", token.getToken()).append("lon", 0.0)
+					.append("lat", 0.0).append("friends", new ArrayList<Document>()).append("active", false)
+					.append("confirmemail", confirmemail));
 		}
 		return token;
 	}
 
 	@Override
 	public boolean confirmUser(String email, String token) {
-		UpdateResult res = usersCollection.updateOne(new Document("email", email).append("confirmemail", token),new Document("$unSet",new Document("confirmemail","")));
-		return res.getModifiedCount()>0;
+		boolean res;
+		UpdateResult updateResult = usersCollection.updateOne(
+				new Document("email", email).append("confirmemail", token),
+				new Document("$unset", new Document("confirmemail", "")));
+		res = updateResult.getModifiedCount() > 0;
+		if (res)
+			usersCollection.updateOne(new Document("email", email), new Document("$set", new Document("active", true)));
+		return res;
 	}
 
-	
 	@Override
 	public boolean updateUser(User bean) {
-		UpdateResult res = usersCollection.updateOne(new Document("email", bean.getEmail()),new Document("$set",new Document(Document.parse(gson.toJson(bean)))));
-		return res.getModifiedCount()>0;
+		UpdateResult res = usersCollection.updateOne(new Document("email", bean.getEmail()),
+				new Document("$set", new Document(Document.parse(gson.toJson(bean)))));
+		return res.getModifiedCount() > 0;
 	}
 
 	@Override
@@ -133,16 +141,15 @@ public class DAOUserImpl implements DAOUser, Closeable {
 		Document user = null;
 		boolean res = false;
 		user = usersCollection.find(new Document("email", token.getEmail()).append("token", token.getToken())).first();
-		
+
 		if (user == null) {
-			return Response.Status.UNAUTHORIZED;			
-		}else if(!user.getBoolean("active")){
+			return Response.Status.UNAUTHORIZED;
+		} else if (!user.getBoolean("active")) {
 			return Response.Status.FORBIDDEN;
-		}else{
+		} else {
 			return Response.Status.OK;
 		}
-		
-		
+
 	}
 
 	@Override
@@ -281,5 +288,4 @@ public class DAOUserImpl implements DAOUser, Closeable {
 		return updateResult.wasAcknowledged();
 	}
 
-	
 }

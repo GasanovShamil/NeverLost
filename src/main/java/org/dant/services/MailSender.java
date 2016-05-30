@@ -1,3 +1,5 @@
+package org.dant.services;
+
 import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -18,7 +20,7 @@ public class MailSender {
 	static Session getMailSession;
 	static MimeMessage generateMailMessage;
   
-	public static void sendEmail(String email,String token) throws AddressException, MessagingException {
+	public static void sendEmail(String email,String token){
  
 		// Step1
 		System.out.println("\n 1st ===> setup Mail Server Properties..");
@@ -32,21 +34,25 @@ public class MailSender {
 		System.out.println("\n\n 2nd ===> get Mail Session..");
 		getMailSession = Session.getDefaultInstance(mailServerProperties, null);
 		generateMailMessage = new MimeMessage(getMailSession);
-		generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress("gasanov.sh@gmail.com"));
-		generateMailMessage.addRecipient(Message.RecipientType.CC, new InternetAddress("leo.foltzrahem@gmail.com"));
+		try {
+		generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
 		generateMailMessage.setSubject("NEVERLOST LIVE MAZAFAKA!!!!!!!");
 		String emailBody = "Confirmation email from Neverlost.<br>"+"Click <a href=\"http://localhost:8080/NeverLost/rest/services/confirmemail?email="+email+"&token="+token+"\">here</a> to confirm your email.";
 		generateMailMessage.setContent(emailBody, "text/html");
 		System.out.println("Mail Session has been created successfully..");
- 
+		
 		// Step3
 		System.out.println("\n\n 3rd ===> Get Session and Send mail");
 		Transport transport = getMailSession.getTransport("smtp");
- 
+		
 		// Enter your correct gmail UserID and Password
 		// if you have 2FA enabled then provide App Specific Password
 		transport.connect("smtp.gmail.com", "neverlostappli@gmail.com", "neverlost8");
 		transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
 		transport.close();
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
