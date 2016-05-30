@@ -2,9 +2,12 @@ package org.dant.services;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -227,6 +230,7 @@ public class UserServices {
 		ArrayList<String> channels = new ArrayList<String>();
 		Date date = new Date();
 		DateFormat shortDate = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT);
+		shortDate.setTimeZone(TimeZone.getTimeZone("GMT+2"));
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
 			user = userDAO.getUser(token.getEmail());
 			friends = user.getFriends();
