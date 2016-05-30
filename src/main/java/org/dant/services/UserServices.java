@@ -18,7 +18,6 @@ import javax.ws.rs.core.Response;
 import org.bson.Document;
 import org.dant.beans.JsonConnectionBean;
 import org.dant.beans.JsonSessionToken;
-import org.dant.beans.UpdateBean;
 import org.dant.beans.User;
 import org.dant.db.DAOUserImpl;
 
@@ -55,17 +54,17 @@ public class UserServices {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/updateuser")
-	public Response updateUser(UpdateBean updateBean) {
+	public Response updateUser(User bean) {
 
 		boolean res;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
-			res = userDAO.updateUser(updateBean);
+			res = userDAO.updateUser(bean);
 		} catch (IOException e) {
 			res = false;
 		}
 
 		if (res) {
-			System.out.println("User : " + updateBean.getEmail() + " - updated");
+			System.out.println("User : " + bean.getEmail() + " - updated");
 			return Response.ok().build();
 		} else {
 			return Response.status(Response.Status.CONFLICT).build();
@@ -211,8 +210,8 @@ public class UserServices {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Path("/sendmypos/{lon}/{lat}")
-	public Response sendMyPos(JsonSessionToken token, @PathParam("lon") double lon, @PathParam("lat") double lat) {
+	@Path("/sendmypos/{lat}/{lon}")
+	public Response sendMyPos(JsonSessionToken token, @PathParam("lat") double lat, @PathParam("lon") double lon) {
 		User user = null;
 		ArrayList<Document> friends = null;
 		ArrayList<String> channels = new ArrayList<String>();
@@ -221,7 +220,7 @@ public class UserServices {
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
 			user = userDAO.getUser(token.getEmail());
 			friends = user.getFriends();
-			userDAO.setUserPos(token.getEmail(), date, lon, lat);
+			userDAO.setUserPos(token.getEmail(), date, lat, lon);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -235,8 +234,8 @@ public class UserServices {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", token.getEmail());
 			data.put("date", shortDate.format(date));
-			data.put("lon", "" + lon);
 			data.put("lat", "" + lat);
+			data.put("lon", "" + lon);
 			sender.send(channels, "updatePos", data);
 			return Response.ok().build();
 		}

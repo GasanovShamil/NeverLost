@@ -8,7 +8,6 @@ import java.util.Date;
 import org.bson.Document;
 import org.dant.beans.JsonConnectionBean;
 import org.dant.beans.JsonSessionToken;
-import org.dant.beans.UpdateBean;
 import org.dant.beans.User;
 
 import com.google.gson.Gson;
@@ -77,8 +76,8 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	}
 
 	@Override
-	public boolean updateUser(UpdateBean updateBean) {
-		UpdateResult res = usersCollection.updateOne(new Document("email", updateBean.getEmail()),new Document("$set",new Document(Document.parse(gson.toJson(updateBean)))));
+	public boolean updateUser(User bean) {
+		UpdateResult res = usersCollection.updateOne(new Document("email", bean.getEmail()),new Document("$set",new Document(Document.parse(gson.toJson(bean)))));
 		return res.getModifiedCount()>0;
 	}
 
@@ -261,9 +260,9 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	}
 
 	@Override
-	public boolean setUserPos(String email, Date date, double lon, double lat) {
+	public boolean setUserPos(String email, Date date, double lat, double lon) {
 		UpdateResult updateResult = usersCollection.updateOne(new Document("email", email),
-				new Document("$set", new Document("lon", lon).append("lat", lat).append("date", date)));
+				new Document("$set", new Document("lat", lat).append("lon", lon).append("date", date)));
 
 		return updateResult.wasAcknowledged();
 	}

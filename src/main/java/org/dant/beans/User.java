@@ -12,12 +12,14 @@ public class User implements Serializable{
 	 */
 	private static final long serialVersionUID = 5420434289477335204L;
 	private String email, username;
+	private String token;
 	private ArrayList<Document> friends;
 	private double lon,lat;
 	private Date date;
 	private Integer confirmed;
 
 	
+	public User(){}
 	
 	public User(String email, String username) {
 		this.email = email;
@@ -83,6 +85,14 @@ public class User implements Serializable{
 
 	public void setConfirmed(Integer confirmed) {
 		this.confirmed = confirmed;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	
