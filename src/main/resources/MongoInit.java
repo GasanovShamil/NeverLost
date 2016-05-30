@@ -1,4 +1,3 @@
-package org.dant.test;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,7 +10,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-public class MongoTest {
+public class MongoInit {
 
 	public static void main(String args[]) {
 
