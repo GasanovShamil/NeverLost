@@ -55,15 +55,26 @@ public class UserServices {
 			return Response.status(Response.Status.CONFLICT).entity("User already exist.").build();
 		}
 	}
-	
+
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("/confirmemail")
-	public void confirmEmail(@QueryParam("email") String email, @QueryParam("token") String token) {
-		System.out.println("CONFIRMATION : "+email+" - "+token);
-		
+	public String confirmEmail(@QueryParam("email") String email, @QueryParam("token") String token) {
+		boolean res = false;
+		try (DAOUserImpl userDAO = new DAOUserImpl()) {
+			res = userDAO.confirmUser(email, token);
+		} catch (IOException e) {
+			return "<html> " + "<title>" + "Confirm" + "</title>" + "<body><h1>" + "Something went wrong!"
+					+ "</body></h1>" + "</html> ";
+		}
+		if (res) {
+			return "<html> " + "<title>" + "Confirm" + "</title>" + "<body><h1>Hello " + email + "!</body></h1>"+"<br><P>Email confirmed!</p>"+"</html> ";
+		} else {
+			return "<html> " + "<title>" + "NNNNNNNOOOOOOOONONONONONONONONONONONON" + "</title>"
+					+ "<body><h1>NNNNNNNOOOOOOOONONONONONONONONONONONON</body></h1>" + "</html> ";
+		}
 	}
-	
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/updateuser")
@@ -134,11 +145,14 @@ public class UserServices {
 			res = false;
 		}
 		if (res && me != null) {
+			Date date = me.getDate();
+			DateFormat shortDate = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT);	
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", me.getEmail());
 			data.put("username", me.getUsername());
-			data.put("lat", ""+me.getLat());
-			data.put("lon", ""+me.getLon());
+			data.put("date", shortDate.format(date));
+			data.put("lat", "" + me.getLat());
+			data.put("lon", "" + me.getLon());
 			ArrayList<String> channels = new ArrayList<String>();
 			channels.add(emailfriend);
 			sender.send(channels, "friendRequest", data);
@@ -161,13 +175,15 @@ public class UserServices {
 		} catch (IOException e) {
 			res = false;
 		}
-
 		if (res && me != null) {
+			Date date = me.getDate();
+			DateFormat shortDate = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT);
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", me.getEmail());
 			data.put("username", me.getUsername());
-			data.put("lat", ""+me.getLat());
-			data.put("lon", ""+me.getLon());
+			data.put("date", shortDate.format(date));
+			data.put("lat", "" + me.getLat());
+			data.put("lon", "" + me.getLon());
 			ArrayList<String> channels = new ArrayList<String>();
 			channels.add(emailfriend);
 			sender.send(channels, "friendConfirm", data);
@@ -202,10 +218,8 @@ public class UserServices {
 	@Path("/getfriendlist")
 	public Response getFriendList(JsonSessionToken token) {
 		ArrayList<User> friends = null;
-		User u = null;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
 			friends = userDAO.getFriends(token.getEmail());
-			u=userDAO.getUser(token.getEmail());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -229,7 +243,7 @@ public class UserServices {
 		ArrayList<Document> friends = null;
 		ArrayList<String> channels = new ArrayList<String>();
 		Date date = new Date();
-		DateFormat shortDate = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT);
+		DateFormat shortDate = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 		shortDate.setTimeZone(TimeZone.getTimeZone("GMT+2"));
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
 			user = userDAO.getUser(token.getEmail());

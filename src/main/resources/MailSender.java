@@ -1,4 +1,3 @@
-package org.dant.test;
 import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -13,18 +12,13 @@ import javax.mail.internet.MimeMessage;
  * 
  */
  
-public class MailTest {
+public class MailSender {
  
 	static Properties mailServerProperties;
 	static Session getMailSession;
 	static MimeMessage generateMailMessage;
- 
-	public static void main(String args[]) throws AddressException, MessagingException {
-		sendEmail("token");
-		System.out.println("\n\n ===> Your Java Program has just sent an Email successfully. Check your email..");
-	}
- 
-	public static void sendEmail(String token) throws AddressException, MessagingException {
+  
+	public static void sendEmail(String email,String token) throws AddressException, MessagingException {
  
 		// Step1
 		System.out.println("\n 1st ===> setup Mail Server Properties..");
@@ -41,7 +35,7 @@ public class MailTest {
 		generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress("gasanov.sh@gmail.com"));
 		generateMailMessage.addRecipient(Message.RecipientType.CC, new InternetAddress("leo.foltzrahem@gmail.com"));
 		generateMailMessage.setSubject("NEVERLOST LIVE MAZAFAKA!!!!!!!");
-		String emailBody = "Test email from Neverlost.";
+		String emailBody = "Confirmation email from Neverlost.<br>"+"Click <a href=\"http://localhost:8080/NeverLost/rest/services/confirmemail?email="+email+"&token="+token+"\">here</a> to confirm your email.";
 		generateMailMessage.setContent(emailBody, "text/html");
 		System.out.println("Mail Session has been created successfully..");
  

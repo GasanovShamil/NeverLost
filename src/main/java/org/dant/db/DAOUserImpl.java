@@ -71,12 +71,19 @@ public class DAOUserImpl implements DAOUser, Closeable {
 			token.setEmail(bean.getEmail());
 			token.generateToken();
 			usersCollection.insertOne(new Document("email", bean.getEmail()).append("username", bean.getUsername())
-					.append("password", bean.getPassword()).append("token", token.getToken()).append("lon", 0.0)
-					.append("lat", 0.0).append("friends", new ArrayList<Document>()));
+					.append("password", bean.getPassword()).append("confirmemail", token.getToken()).append("lon", 0.0)
+					.append("lat", 0.0).append("friends", new ArrayList<Document>()).append("active", false));
 		}
 		return token;
 	}
 
+	@Override
+	public boolean confirmUser(String email, String token) {
+		UpdateResult res = usersCollection.updateOne(new Document("email", email).append("confirmemail", token),new Document("$unSet",new Document("confirmemail","")));
+		return res.getModifiedCount()>0;
+	}
+
+	
 	@Override
 	public boolean updateUser(User bean) {
 		UpdateResult res = usersCollection.updateOne(new Document("email", bean.getEmail()),new Document("$set",new Document(Document.parse(gson.toJson(bean)))));
@@ -274,4 +281,5 @@ public class DAOUserImpl implements DAOUser, Closeable {
 		return updateResult.wasAcknowledged();
 	}
 
+	
 }
