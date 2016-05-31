@@ -95,6 +95,11 @@ public class User implements Serializable{
 		this.token = token;
 	}
 
-	
-
+	public void onlyConfirmedFriends(){
+		ArrayList<Document> res=new ArrayList<Document>();
+		for(Document doc : friends){
+			if(doc.getInteger("confirmed")==1) res.add(doc);
+		}
+		friends = res;
+	}
 }

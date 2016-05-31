@@ -4,8 +4,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.UUID;
-
 import javax.ws.rs.core.Response;
 
 import org.bson.Document;
@@ -179,6 +177,7 @@ public class DAOUserImpl implements DAOUser, Closeable {
 			userClass.setLat(result.getDouble("lat"));
 			// userClass = new Gson().fromJson(result.toJson(), User.class);
 		}
+		userClass.onlyConfirmedFriends();
 		return userClass;
 	}
 
