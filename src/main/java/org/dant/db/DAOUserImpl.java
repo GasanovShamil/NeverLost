@@ -61,20 +61,18 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	}
 
 	@Override
-	public JsonSessionToken createUser(JsonConnectionBean bean, String confirmemail) {
+	public boolean createUser(JsonConnectionBean bean, String confirmemail) {
 		Document user = null;
-		JsonSessionToken token = null;
+		boolean res = false;
 		user = usersCollection.find(new Document("email", bean.getEmail())).first();
 		if (user == null) {
-			token = new JsonSessionToken();
-			token.setEmail(bean.getEmail());
-			token.generateToken();
 			usersCollection.insertOne(new Document("email", bean.getEmail()).append("username", bean.getUsername())
-					.append("password", bean.getPassword()).append("token", token.getToken()).append("lon", 0.0)
-					.append("lat", 0.0).append("friends", new ArrayList<Document>()).append("active", false)
+					.append("password", bean.getPassword()).append("lon", 0.0).append("lat", 0.0)
+					.append("friends", new ArrayList<Document>()).append("active", false)
 					.append("confirmemail", confirmemail));
+			res = true;
 		}
-		return token;
+		return res;
 	}
 
 	@Override

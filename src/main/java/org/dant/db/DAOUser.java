@@ -14,7 +14,7 @@ public interface DAOUser {
 	public JsonSessionToken login(JsonConnectionBean bean);
 	public Response.Status checkout(JsonSessionToken token);
 	public void logout(JsonSessionToken token);
-	public JsonSessionToken createUser(JsonConnectionBean bean, String confirmemail);
+	public boolean createUser(JsonConnectionBean bean, String confirmemail);
 	public boolean confirmUser(String email, String token);
 	public boolean updateUser(User bean);
 	public boolean deleteUser(JsonSessionToken token);

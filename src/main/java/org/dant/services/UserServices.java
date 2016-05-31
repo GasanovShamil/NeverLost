@@ -42,16 +42,16 @@ public class UserServices {
 	@Path("/createuser")
 	public Response createUser(JsonConnectionBean bean) {
 		String confirmemail = UUID.randomUUID().toString();
-		JsonSessionToken token;
+		boolean result;
 		try (DAOUserImpl userDAO = new DAOUserImpl()) {
-			token = userDAO.createUser(bean, confirmemail);
+			result = userDAO.createUser(bean, confirmemail);
 		} catch (IOException e) {
-			token = null;
+			result = false;
 		}
-		if (token != null) {
+		if (result) {
 			System.out.println("User created : " + bean.getEmail() + ", password : " + bean.getPassword());
 			MailSender.sendEmail(bean.getEmail(), confirmemail);
-			return Response.ok(token).build();
+			return Response.ok().build();
 		} else {
 			return Response.status(Response.Status.CONFLICT).entity("User already exist.").build();
 		}
