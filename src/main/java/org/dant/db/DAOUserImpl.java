@@ -137,7 +137,6 @@ public class DAOUserImpl implements DAOUser, Closeable {
 	@Override
 	public Response.Status checkout(JsonSessionToken token) {
 		Document user = null;
-		boolean res = false;
 		user = usersCollection.find(new Document("email", token.getEmail()).append("token", token.getToken())).first();
 
 		if (user == null) {
@@ -229,36 +228,6 @@ public class DAOUserImpl implements DAOUser, Closeable {
 		User user = getUser(friend);
 		UpdateResult updateResult1 = null;
 		UpdateResult updateResult2 = null;
-		UpdateResult updateResult3 = null;
-		UpdateResult updateResult4 = null;
-		// if (user != null) {
-		// updateResult1 = usersCollection.updateOne(new Document("email", me),
-		// new Document("$pull",
-		// new Document("friends", new Document("email",
-		// friend).append("confirmed", -1))));
-		//
-		// updateResult2 = usersCollection.updateOne(new Document("email",
-		// friend),
-		// new Document("$pull", new Document("friends", new Document("email",
-		// me).append("confirmed", 0))));
-		//
-		// if (updateResult1.getModifiedCount() > 0 &&
-		// updateResult2.getModifiedCount() > 0) {
-		// updateResult3 = usersCollection.updateOne(new Document("email", me),
-		// new Document("$addToSet",
-		// new Document("friends", new Document("email",
-		// friend).append("confirmed", 1))));
-		//
-		// updateResult4 = usersCollection.updateOne(new Document("email",
-		// friend), new Document("$addToSet",
-		// new Document("friends", new Document("email", me).append("confirmed",
-		// 1))));
-		// res = updateResult3.wasAcknowledged() &&
-		// updateResult4.wasAcknowledged();
-		// }
-		// // res = updateResult.getModifiedCount()>1;
-		//
-		// }
 		if (user != null) {
 			updateResult1 = usersCollection.updateOne(
 					new Document("email", me).append("friends.email", friend).append("friends.confirmed", -1),
