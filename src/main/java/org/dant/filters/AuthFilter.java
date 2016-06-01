@@ -22,7 +22,6 @@ public class AuthFilter implements ContainerRequestFilter {
 		if (!url.contains("login") && !url.contains("checkout") && !url.contains("createuser")  && !url.contains("confirmemail")) {
 			String data = IOUtils.toString(context.getEntityStream(), "UTF-8");
 			System.out.println("FILTER CHECK : " + new Gson().fromJson(data, JsonSessionToken.class).token);
-			boolean auth;
 			Response.Status response;
 			try (DAOUserImpl userDAO = new DAOUserImpl()) {
 				response = userDAO.checkout(new Gson().fromJson(data, JsonSessionToken.class));
