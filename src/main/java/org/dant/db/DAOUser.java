@@ -5,7 +5,6 @@ import java.util.Date;
 
 import javax.ws.rs.core.Response;
 
-import org.bson.Document;
 import org.dant.beans.JsonConnectionBean;
 import org.dant.beans.JsonSessionToken;
 import org.dant.beans.User;
@@ -27,4 +26,5 @@ public interface DAOUser {
 	public boolean refuseFriend(String me, String friend);
 	public ArrayList<User> getFriends(String email);
 	public boolean setUserPos(String email,Date date, double lon, double lat);
+	public boolean reinitPassword(String email, String password);
 }

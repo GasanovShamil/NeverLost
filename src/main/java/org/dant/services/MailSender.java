@@ -9,10 +9,6 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
  
-/**
- * @author Crunchify.com
- * 
- */
  
 public class MailSender {
  
@@ -20,33 +16,29 @@ public class MailSender {
 	static Session getMailSession;
 	static MimeMessage generateMailMessage;
   
-	public static void sendEmail(String email,String token){
+	public static void sendEmail(String email,String token, int check){
  
-		// Step1
-		System.out.println("\n 1st ===> setup Mail Server Properties..");
 		mailServerProperties = System.getProperties();
 		mailServerProperties.put("mail.smtp.port", "587");
 		mailServerProperties.put("mail.smtp.auth", "true");
 		mailServerProperties.put("mail.smtp.starttls.enable", "true");
-		System.out.println("Mail Server Properties have been setup successfully..");
- 
-		// Step2
-		System.out.println("\n\n 2nd ===> get Mail Session..");
+
 		getMailSession = Session.getDefaultInstance(mailServerProperties, null);
 		generateMailMessage = new MimeMessage(getMailSession);
 		try {
 		generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
-		generateMailMessage.setSubject("NEVERLOST LIVE MAZAFAKA!!!!!!!");
-		String emailBody = "Confirmation email from Neverlost.<br>"+"Click <a href=\"http://localhost:8080/NeverLost/rest/services/confirmemail?email="+email+"&token="+token+"\">here</a> to confirm your email.";
+		generateMailMessage.setSubject("NEVERLOST LIVE!!!!!!!");
+		String emailBody;
+		if(check == 0){
+			emailBody = "<h1>Confirmation email from Neverlost.</h1><br>"+"<h2>Click <a href=\"http://localhost:8080/NeverLost/rest/services/confirmemail?email="+email+"&token="+token+"\">here</a> to confirm your email.</h2>";
+		}else{
+			emailBody = "<h1>Bonjour " + email + "!</h1>"
+					+ "<br><P>Voici votre nouveau mot de passe : "+token+"</p>" + "</html> ";
+		}
 		generateMailMessage.setContent(emailBody, "text/html");
-		System.out.println("Mail Session has been created successfully..");
 		
-		// Step3
-		System.out.println("\n\n 3rd ===> Get Session and Send mail");
 		Transport transport = getMailSession.getTransport("smtp");
 		
-		// Enter your correct gmail UserID and Password
-		// if you have 2FA enabled then provide App Specific Password
 		transport.connect("smtp.gmail.com", "neverlostappli@gmail.com", "neverlost8");
 		transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
 		transport.close();

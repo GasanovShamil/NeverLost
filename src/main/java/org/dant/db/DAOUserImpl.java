@@ -7,6 +7,7 @@ import java.util.Date;
 import javax.ws.rs.core.Response;
 
 import org.bson.Document;
+import org.dant.beans.HashPass;
 import org.dant.beans.JsonConnectionBean;
 import org.dant.beans.JsonSessionToken;
 import org.dant.beans.User;
@@ -284,6 +285,13 @@ public class DAOUserImpl implements DAOUser, Closeable {
 				new Document("$set", new Document("lat", lat).append("lon", lon).append("date", date)));
 
 		return updateResult.wasAcknowledged();
+	}
+
+	@Override
+	public boolean reinitPassword(String email, String password) {
+		UpdateResult updateResult = usersCollection.updateOne(new Document("email", email),
+				new Document("$set", new Document("password", HashPass.getHash(password))));
+		return updateResult.getModifiedCount()>0;
 	}
 
 }

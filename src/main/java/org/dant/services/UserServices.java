@@ -50,7 +50,7 @@ public class UserServices {
 		}
 		if (result) {
 			System.out.println("User created : " + bean.getEmail() + ", password : " + bean.getPassword());
-			MailSender.sendEmail(bean.getEmail(), confirmemail);
+			MailSender.sendEmail(bean.getEmail(), confirmemail,0);
 			return Response.ok().build();
 		} else {
 			return Response.status(Response.Status.CONFLICT).entity("User already exist.").build();
@@ -69,7 +69,8 @@ public class UserServices {
 					+ "</body></h1>" + "</html> ";
 		}
 		if (res) {
-			return "<html> " + "<title>" + "Confirm" + "</title>" + "<body><h1>Hello " + email + "!</body></h1>"+"<br><P>Email confirmed!</p>"+"</html> ";
+			return "<html> " + "<title>" + "Confirm" + "</title>" + "<body><h1>Hello " + email + "!</body></h1>"
+					+ "<br><P>Email confirmed!</p>" + "</html> ";
 		} else {
 			return "<html> " + "<title>" + "NNNNNNNOOOOOOOONONONONONONONONONONONON" + "</title>"
 					+ "<body><h1>NNNNNNNOOOOOOOONONONONONONONONONONONON</body></h1>" + "</html> ";
@@ -147,7 +148,7 @@ public class UserServices {
 		}
 		if (res && me != null) {
 			Date date = me.getDate();
-			DateFormat shortDate = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT);	
+			DateFormat shortDate = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", me.getEmail());
 			data.put("username", me.getUsername());
@@ -178,7 +179,7 @@ public class UserServices {
 		}
 		if (res && me != null) {
 			Date date = me.getDate();
-			DateFormat shortDate = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT);
+			DateFormat shortDate = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", me.getEmail());
 			data.put("username", me.getUsername());
@@ -269,6 +270,26 @@ public class UserServices {
 			return Response.ok().build();
 		}
 		return Response.status(Response.Status.NOT_FOUND).entity("No friends LOOOSER").build();
+	}
+
+	@GET
+	@Path("/reinitpassword/{email}")
+	public Response reinitPassword(@PathParam("email") String email) {
+		boolean res = false;
+		
+		String newPassword = UUID.randomUUID().toString().substring(0, 8);
+
+		try (DAOUserImpl userDAO = new DAOUserImpl()) {
+			res = userDAO.reinitPassword(email, newPassword);
+		} catch (IOException e) {
+
+		}
+		if (res) {
+			MailSender.sendEmail(email, newPassword,1);
+			return Response.ok().build();
+		} else {
+			return Response.status(Response.Status.NOT_FOUND).entity("Email not found").build();
+		}
 	}
 
 }
