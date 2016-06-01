@@ -89,6 +89,7 @@ public class DAOUserImpl implements DAOUser, Closeable {
 
 	@Override
 	public boolean updateUser(User bean) {
+		bean.hashPass();
 		UpdateResult res = usersCollection.updateOne(new Document("email", bean.getEmail()),
 				new Document("$set", new Document(Document.parse(gson.toJson(bean)))));
 		return res.getModifiedCount() > 0;

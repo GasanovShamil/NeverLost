@@ -25,23 +25,7 @@ public class JsonConnectionBean implements Serializable {
 	}
 
 	public String getPassword() {
-		MessageDigest md = null;
-		String fortpass = password + salt;
-		StringBuffer sb;
-		try {
-			md = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		md.update(fortpass.getBytes());
-
-		byte[] digest = md.digest();
-		sb = new StringBuffer();
-		for (byte b : digest) {
-			sb.append(String.format("%02x", b & 0xff));
-		}
-		System.out.println("Digest(in hex format):: " + sb.toString());
-		return sb.toString();
+		return HashPass.getHash(password);
 	}
 
 	public void setPassword(String password) {

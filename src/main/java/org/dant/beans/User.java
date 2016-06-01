@@ -17,6 +17,7 @@ public class User implements Serializable{
 	private double lon,lat;
 	private Date date;
 	private Integer confirmed;
+	private String password;
 
 	
 	public User(){}
@@ -101,5 +102,17 @@ public class User implements Serializable{
 			if(doc.getInteger("confirmed")==1) res.add(doc);
 		}
 		friends = res;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	public void hashPass(){
+		password = HashPass.getHash(password);
 	}
 }
