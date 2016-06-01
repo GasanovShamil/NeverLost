@@ -29,7 +29,7 @@ public class MailSender {
 		generateMailMessage.setSubject("NEVERLOST LIVE!!!!!!!");
 		String emailBody;
 		if(check == 0){
-			emailBody = "<h1>Confirmation email from Neverlost.</h1><br>"+"<h2>Click <a href=\"http://localhost:8080/NeverLost/rest/services/confirmemail?email="+email+"&token="+token+"\">here</a> to confirm your email.</h2>";
+			emailBody = "<h1>Confirmation email from Neverlost.</h1><br>"+"<h2>Click <a href=\"http://86.245.59.40/NeverLost/rest/services/confirmemail?email="+email+"&token="+token+"\">here</a> to confirm your email.</h2>";
 		}else{
 			emailBody = "<h1>Bonjour " + email + "!</h1>"
 					+ "<br><P>Voici votre nouveau mot de passe : "+token+"</p>" + "</html> ";
